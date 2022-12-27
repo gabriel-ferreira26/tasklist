@@ -1,23 +1,24 @@
 /* eslint-disable class-methods-use-this */
+import * as yup from 'yup';
 import User from '../models/user';
-import * as yup from yup;
 
 class UserController {
   async store(req, res) {
-
-    let schema = yup.object().shape({
+    const schema = yup.object().shape({
       firstName: yup.string().required(),
       lastName: yup.string().required(),
       email: yup.string().email().required(),
-      password: yup.string().required().min(8).max(16)
+      password: yup.string().required().min(8).max(16),
     });
 
     const {
       firstName, lastName, email, password,
     } = req.body;
 
-    if(!schema.isValid({firstName, lastName, email, password})){
-      return res.status(400).json({error: 'Envie os dados corretamente!'});
+    if (!(await schema.isValid({
+      firstName, lastName, email, password,
+    }))) {
+      return res.status(400).json({ error: 'Envie os dados corretamente!' });
     }
 
     const user = await User.findOne({
